@@ -18,27 +18,28 @@ import com.bah.msd.domain.Customer;
 import com.bah.msd.domain.CustomerFactory;
 import com.bah.msd.domain.Token;
 import com.bah.msd.jwt.JWTHelper;
+import com.bah.msd.logging.ApiLogger;
 
 @RestController
 @RequestMapping("/token")
 public class TokenAPI {
 
 	String dataApiHost = "localhost:8080";
-	
-	//private static Key key = AuthFilter.key;	
+		
 	public static Token appUserToken;
 	
 	@GetMapping
 	public String getAll() {
+		ApiLogger.log("GET request to return a fake token");
 		return "jwt-fake-token-asdfasdfasfa".toString();
 	}
 	
 	@PostMapping
-	// public ResponseEntity<?> createTokenForCustomer(@RequestBody Customer customer, HttpRequest request, UriComponentsBuilder uri) {
 	public ResponseEntity<?> createTokenForCustomer(@RequestBody Customer customer) {
 		
 		String username = customer.getName();
 		String password = customer.getPassword();
+		ApiLogger.log("POST request to create token for customer " + username);
 		
 		if (username != null && username.length() > 0 && password != null && password.length() > 0 && checkPassword(username, password)) {
 			Token token = createToken(username);
@@ -63,19 +64,6 @@ public class TokenAPI {
 			return true;				
 		}		
 		return false;
-		
-		// local version of the above code, gets customer from repository
-		/*
-		Iterator<Customer> customers = repo.findAll().iterator();
-		while(customers.hasNext()) {
-			Customer cust = customers.next();
-			if(cust.getName().equals(username) && cust.getPassword().equals(password)) {
-				return true;				
-			}
-		}
-		*/
-		
-
 	}
 	
 	public static Token getAppUserToken() {
@@ -86,22 +74,12 @@ public class TokenAPI {
 	}
 	
     private static Token createToken(String username) {
-    	String scopes = "com.webage.data.apis";
+    	String scopes = "com.bah.msd.data.apis";
     	// special case for application user
     	if( username.equalsIgnoreCase("ApiClientApp")) {
-    		scopes = "com.webage.auth.apis";
+    		scopes = "com.bah.msd.auth.apis";
     	}
     	String token_string = JWTHelper.createToken(scopes);
-    	
-		/*
-		 * long fiveHoursInMillis = 1000 * 60 *60 * 5;
-		 * 
-		 * String token_string = Jwts.builder() .setSubject(username)
-		 * .setIssuer("me@me.com") .claim("scopes",scopes) .setExpiration(new
-		 * Date(System.currentTimeMillis() + fiveHoursInMillis)) .signWith(key)
-		 * .compact();
-		 */
-    	
     	return new Token(token_string);
     }
     

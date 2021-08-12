@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.bah.msd.domain.Customer;
 import com.bah.msd.domain.CustomerFactory;
 import com.bah.msd.domain.Token;
+import com.bah.msd.logging.ApiLogger;
 
 @RestController
 @RequestMapping("/register")
@@ -29,6 +31,7 @@ public class RegisterAPI {
 
 	@PostMapping
 	public ResponseEntity<?> registerCustomer(@RequestBody Customer newCustomer, UriComponentsBuilder uri) {
+		ApiLogger.log("POST request to reigster new customer " + newCustomer.getName());
 		if (newCustomer.getId() != 0 || newCustomer.getName() == null || newCustomer.getEmail() == null) {
 			// Reject we'll assign the customer id
 			return ResponseEntity.badRequest().build();
@@ -37,9 +40,6 @@ public class RegisterAPI {
 		String json_string = CustomerFactory.getCustomerAsJSONString(newCustomer);
 		
 		postNewCustomerToCustomerAPI(json_string);
-		
-		// old code that calls repository directly
-		// newCustomer = repo.save(newCustomer);
 		
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(newCustomer.getId()).toUri();
