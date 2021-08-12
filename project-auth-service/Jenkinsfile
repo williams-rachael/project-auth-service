@@ -1,6 +1,6 @@
 node {
     stage ("Checkout AuthApi"){
-        git branch: 'develop', url: '/home/osboxes/MSDProject/projectRepo/msd-auth-service-repo'
+        git branch: 'develop', url: 'https://github.com/williams-rachael/project-auth-service.git'
     }
     
     stage ("Gradle Build - AuthApi") {
